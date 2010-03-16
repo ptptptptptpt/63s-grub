@@ -78,7 +78,7 @@ print_entries (void)
         console_gotoxy (32, 6 + (entryno-1)*2 );
         if (entryno == grub_current_entryno)
         {
-            console_current_color = ( ( (menu_color & 0xf) << 4) | ( (menu_color >> 4) & 0xf) );
+            console_current_color = ( ( (menu_color & 0x7) << 4) | ( (menu_color >> 4) & 0xf) );
             grub_printf ( " [%d] %s ", entryno, p_cfg_entries_start + (entryno-1)*80 );
             console_current_color = menu_color;
         }
