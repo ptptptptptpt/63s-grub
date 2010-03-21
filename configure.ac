@@ -58,6 +58,7 @@ fi
 AC_CHECK_TOOL(CC, gcc)
 AC_PROG_CC
 AM_PROG_AS
+AM_PROG_CC_C_O
 # We need this for older versions of Autoconf.
 _AM_DEPENDENCIES(CC)
 
@@ -88,13 +89,13 @@ if test "x$ac_cv_prog_gcc" = xyes; then
     fi
     STAGE1_CFLAGS="-O2 -fno-strict-aliasing"
     GRUB_CFLAGS="-O2 -fno-strict-aliasing"
-    AC_CACHE_CHECK([whether optimization for size works], size_flag, [
-      saved_CFLAGS=$CFLAGS
+    AC_CACHE_CHECK([whether optimization for size works], ac_cv_size_flag, [
+      ac_cv_saved_CFLAGS=$CFLAGS
       CFLAGS="-Os -g"
-      AC_TRY_COMPILE(, , size_flag=yes, size_flag=no)
+      AC_TRY_COMPILE(, , ac_cv_size_flag=yes, ac_cv_size_flag=no)
       CFLAGS=$saved_CFLAGS
     ])
-    if test "x$size_flag" = xyes; then
+    if test "x$ac_cv_size_flag" = xyes; then
       STAGE2_CFLAGS="-Os -fno-strict-aliasing"
     else
       STAGE2_CFLAGS="-O2 -fno-strength-reduce -fno-unroll-loops -fno-strict-aliasing"
@@ -102,16 +103,16 @@ if test "x$ac_cv_prog_gcc" = xyes; then
     # OpenBSD has a GCC extension for protecting applications from
     # stack smashing attacks, but GRUB doesn't want this feature.
     AC_CACHE_CHECK([whether gcc has -fno-stack-protector],
-		   no_stack_protector_flag, [
+		   ac_cv_no_stack_protector_flag, [
       saved_CFLAGS=$CFLAGS
       CFLAGS="-fno-stack-protector"
       AC_TRY_COMPILE(,
 		     ,
-		     no_stack_protector_flag=yes,
-		     no_stack_protector_flag=no)
+		     ac_cv_no_stack_protector_flag=yes,
+		     ac_cv_no_stack_protector_flag=no)
       CFLAGS=$saved_CFLAGS
     ])
-    if test "x$no_stack_protector_flag" = xyes; then
+    if test "x$ac_cv_no_stack_protector_flag" = xyes; then
       STAGE2_CFLAGS="$STAGE2_CFLAGS -fno-stack-protector"
     fi
   fi
@@ -125,30 +126,30 @@ AC_SUBST(GRUB_CFLAGS)
 CPPFLAGS="$CPPFLAGS -Wall -Wmissing-prototypes -Wunused -Wshadow"
 CPPFLAGS="$CPPFLAGS -Wpointer-arith"
 
-AC_CACHE_CHECK([whether -Wundef works], undef_flag, [
+AC_CACHE_CHECK([whether -Wundef works], ac_cv_undef_flag, [
   saved_CPPFLAGS="$CPPFLAGS"
   CPPFLAGS="-Wundef"
-  AC_TRY_COMPILE(, , undef_flag=yes, undef_flag=no)
+  AC_TRY_COMPILE(, , ac_cv_undef_flag=yes, ac_cv_undef_flag=no)
   CPPFLAGS="$saved_CPPFLAGS"
 ])
 
 # The options `-falign-*' are supported by gcc 3.0 or later.
 # Probably it is sufficient to only check for -falign-loops.
-AC_CACHE_CHECK([whether -falign-loops works], [falign_loop_flag], [
+AC_CACHE_CHECK([whether -falign-loops works], [ac_cv_falign_loop_flag], [
   saved_CPPFLAGS="$CPPFLAGS"
   CPPFLAGS="-falign-loops=1"
-  AC_TRY_COMPILE(, , [falign_loop_flag=yes], [falign_loop_flag=no])
+  AC_TRY_COMPILE(, , [ac_cv_falign_loop_flag=yes], [ac_cv_falign_loop_flag=no])
   CPPFLAGS="$saved_CPPFLAGS"
 ])
 
 # Force no alignment to save space.
-if test "x$falign_loop_flag" = xyes; then
+if test "x$ac_cv_falign_loop_flag" = xyes; then
   CPPFLAGS="$CPPFLAGS -falign-jumps=1 -falign-loops=1 -falign-functions=1"
 else
   CPPFLAGS="$CPPFLAGS -malign-jumps=1 -malign-loops=1 -malign-functions=1"
 fi
 
-if test "x$undef_flag" = xyes; then
+if test "x$ac_cv_undef_flag" = xyes; then
   CPPFLAGS="$CPPFLAGS -Wundef"
 fi
 
@@ -223,12 +224,6 @@ AC_CHECK_HEADERS(string.h strings.h ncurses/curses.h ncurses.h curses.h)
 # Check for user options.
 
 # filesystems support.
-AC_ARG_ENABLE(ext2fs,
-  [  --disable-ext2fs        disable ext2fs support in Stage 2])
-
-if test x"$enable_ext2fs" != xno; then
-  FSYS_CFLAGS="$FSYS_CFLAGS -DFSYS_EXT2FS=1"
-fi
 
 AC_ARG_ENABLE(fat,
   [  --disable-fat           disable FAT support in Stage 2])
@@ -244,63 +239,7 @@ if test x"$enable_ntfs" != xno; then
   FSYS_CFLAGS="$FSYS_CFLAGS -DFSYS_NTFS=1"
 fi
 
-AC_ARG_ENABLE(ffs,
-  [  --disable-ffs           disable FFS support in Stage 2])
-
-if test x"$enable_ffs" != xno; then
-  FSYS_CFLAGS="$FSYS_CFLAGS -DFSYS_FFS=1"
-fi
-
-AC_ARG_ENABLE(ufs2,
-  [  --disable-ufs2          disable UFS2 support in Stage 2])
-
-if test x"$enable_ufs2" != xno; then
-  FSYS_CFLAGS="$FSYS_CFLAGS -DFSYS_UFS2=1"
-fi
-
-AC_ARG_ENABLE(minix,
-  [  --disable-minix         disable Minix fs support in Stage 2])
-
-if test x"$enable_minix" != xno; then
-  FSYS_CFLAGS="$FSYS_CFLAGS -DFSYS_MINIX=1"
-fi
-
-AC_ARG_ENABLE(reiserfs,
-  [  --disable-reiserfs      disable ReiserFS support in Stage 2])
-
-if test x"$enable_reiserfs" != xno; then
-  FSYS_CFLAGS="$FSYS_CFLAGS -DFSYS_REISERFS=1"
-fi
-
-AC_ARG_ENABLE(vstafs,
-  [  --disable-vstafs        disable VSTa FS support in Stage 2])
-
-if test x"$enable_vstafs" != xno; then
-  FSYS_CFLAGS="$FSYS_CFLAGS -DFSYS_VSTAFS=1"
-fi
-
-AC_ARG_ENABLE(jfs,
-  [  --disable-jfs           disable IBM JFS support in Stage 2])
-
-if test x"$enable_jfs" != xno; then
-  FSYS_CFLAGS="$FSYS_CFLAGS -DFSYS_JFS=1"
-fi
-
-AC_ARG_ENABLE(xfs,
-  [  --disable-xfs           disable SGI XFS support in Stage 2])
-
-if test x"$enable_xfs" != xno; then
-  FSYS_CFLAGS="$FSYS_CFLAGS -DFSYS_XFS=1"
-fi
-
-
-
-AC_ARG_ENABLE(gunzip,
-  [  --disable-gunzip        disable decompression in Stage 2])
-
-if test x"$enable_gunzip" = xno; then
-  FSYS_CFLAGS="$FSYS_CFLAGS -DNO_DECOMPRESSION=1"
-fi
+FSYS_CFLAGS="$FSYS_CFLAGS -DNO_DECOMPRESSION=1"
 
 AC_ARG_ENABLE(md5-password,
   [  --disable-md5-password  disable MD5 password support in Stage 2])
