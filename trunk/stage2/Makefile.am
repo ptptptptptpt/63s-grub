@@ -5,15 +5,13 @@ noinst_HEADERS =  \
 	     mb_header.h mb_info.h  \
 	  pc_slice.h   shared.h   term.h
 
-EXTRA_DIST = setjmp.S apm.S $(noinst_SCRIPTS)
+EXTRA_DIST = setjmp.S apm.S $(noinst_SCRIPTS) 63s_grub_cfg
 
 # For <stage1.h>.
 INCLUDES = -I$(top_srcdir)/stage1
 
 
-
-pkglib_DATA = stage2
-noinst_DATA = pre_stage2
+noinst_DATA = pre_stage2 stage2 
 noinst_PROGRAMS = pre_stage2.exec
 
 
@@ -57,7 +55,7 @@ stage2_size.h: pre_stage2
 
 stage2: pre_stage2 63s_grub_cfg
 	-rm -f stage2
-	cat 63s_grub_cfg pre_stage2 > stage2
+	cat $(srcdir)/63s_grub_cfg pre_stage2 > stage2
 
 # General rule for making a raw binary.
 SUFFIXES = .exec

@@ -79,29 +79,7 @@ CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(pre_stage2_exec_SOURCES)
 DIST_SOURCES = $(pre_stage2_exec_SOURCES)
-am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
-am__vpath_adj = case $$p in \
-    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-    *) f=$$p;; \
-  esac;
-am__strip_dir = f=`echo $$p | sed -e 's|^.*/||'`;
-am__install_max = 40
-am__nobase_strip_setup = \
-  srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*|]/\\\\&/g'`
-am__nobase_strip = \
-  for p in $$list; do echo "$$p"; done | sed -e "s|$$srcdirstrip/||"
-am__nobase_list = $(am__nobase_strip_setup); \
-  for p in $$list; do echo "$$p $$p"; done | \
-  sed "s| $$srcdirstrip/| |;"' / .*\//!s/ .*/ ./; s,\( .*\)/[^/]*$$,\1,' | \
-  $(AWK) 'BEGIN { files["."] = "" } { files[$$2] = files[$$2] " " $$1; \
-    if (++n[$$2] == $(am__install_max)) \
-      { print $$2, files[$$2]; n[$$2] = 0; files[$$2] = "" } } \
-    END { for (dir in files) print dir, files[dir] }'
-am__base_list = \
-  sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
-  sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
-am__installdirs = "$(DESTDIR)$(pkglibdir)"
-DATA = $(noinst_DATA) $(pkglib_DATA)
+DATA = $(noinst_DATA)
 HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
@@ -158,6 +136,7 @@ PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PERL = @PERL@
+QEMU = @QEMU@
 RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
@@ -222,12 +201,11 @@ noinst_HEADERS = \
 	     mb_header.h mb_info.h  \
 	  pc_slice.h   shared.h   term.h
 
-EXTRA_DIST = setjmp.S apm.S $(noinst_SCRIPTS)
+EXTRA_DIST = setjmp.S apm.S $(noinst_SCRIPTS) 63s_grub_cfg
 
 # For <stage1.h>.
 INCLUDES = -I$(top_srcdir)/stage1
-pkglib_DATA = stage2
-noinst_DATA = pre_stage2
+noinst_DATA = pre_stage2 stage2 
 MOSTLYCLEANFILES = $(noinst_PROGRAMS)
 PRE_STAGE2_LINK = -nostdlib -Wl,-N -Wl,-Ttext -Wl,8200
 STAGE2_COMPILE = $(STAGE2_CFLAGS) -fno-builtin
@@ -517,26 +495,6 @@ pre_stage2_exec-stage2.obj: stage2.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='stage2.c' object='pre_stage2_exec-stage2.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pre_stage2_exec_CFLAGS) $(CFLAGS) -c -o pre_stage2_exec-stage2.obj `if test -f 'stage2.c'; then $(CYGPATH_W) 'stage2.c'; else $(CYGPATH_W) '$(srcdir)/stage2.c'; fi`
-install-pkglibDATA: $(pkglib_DATA)
-	@$(NORMAL_INSTALL)
-	test -z "$(pkglibdir)" || $(MKDIR_P) "$(DESTDIR)$(pkglibdir)"
-	@list='$(pkglib_DATA)'; test -n "$(pkglibdir)" || list=; \
-	for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  echo "$$d$$p"; \
-	done | $(am__base_list) | \
-	while read files; do \
-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(pkglibdir)'"; \
-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(pkglibdir)" || exit $$?; \
-	done
-
-uninstall-pkglibDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(pkglib_DATA)'; test -n "$(pkglibdir)" || list=; \
-	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
-	test -n "$$files" || exit 0; \
-	echo " ( cd '$(DESTDIR)$(pkglibdir)' && rm -f" $$files ")"; \
-	cd "$(DESTDIR)$(pkglibdir)" && rm -f $$files
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -625,9 +583,6 @@ check: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) check-am
 all-am: Makefile $(PROGRAMS) $(DATA) $(HEADERS)
 installdirs:
-	for dir in "$(DESTDIR)$(pkglibdir)"; do \
-	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
-	done
 install: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
@@ -685,7 +640,7 @@ install-dvi: install-dvi-am
 
 install-dvi-am:
 
-install-exec-am: install-pkglibDATA
+install-exec-am:
 
 install-html: install-html-am
 
@@ -724,7 +679,7 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-pkglibDATA
+uninstall-am:
 
 .MAKE: all check install install-am install-strip
 
@@ -735,11 +690,11 @@ uninstall-am: uninstall-pkglibDATA
 	install-data-am install-dvi install-dvi-am install-exec \
 	install-exec-am install-html install-html-am install-info \
 	install-info-am install-man install-pdf install-pdf-am \
-	install-pkglibDATA install-ps install-ps-am install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
+	install-ps install-ps-am install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic pdf pdf-am ps ps-am tags uninstall \
-	uninstall-am uninstall-pkglibDATA
+	uninstall-am
 
 
 stage2_size.h: pre_stage2
@@ -754,7 +709,7 @@ stage2_size.h: pre_stage2
 
 stage2: pre_stage2 63s_grub_cfg
 	-rm -f stage2
-	cat 63s_grub_cfg pre_stage2 > stage2
+	cat $(srcdir)/63s_grub_cfg pre_stage2 > stage2
 .exec:
 	$(OBJCOPY) -O binary $< $@
 
