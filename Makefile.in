@@ -14,6 +14,7 @@
 # PARTICULAR PURPOSE.
 
 @SET_MAKE@
+
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
@@ -59,6 +60,7 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	install-pdf-recursive install-ps-recursive install-recursive \
 	installcheck-recursive installdirs-recursive pdf-recursive \
 	ps-recursive uninstall-recursive
+DATA = $(noinst_DATA)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 AM_RECURSIVE_TARGETS = $(RECURSIVE_TARGETS:-recursive=) \
@@ -155,6 +157,7 @@ PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PERL = @PERL@
+QEMU = @QEMU@
 RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
@@ -217,6 +220,7 @@ top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = 1.7 gnu
 SUBDIRS = stage2 stage1
 EXTRA_DIST = BUGS MAINTENANCE
+noinst_DATA = 63s-image
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -585,7 +589,7 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-recursive
-all-am: Makefile config.h
+all-am: Makefile $(DATA) config.h
 installdirs: installdirs-recursive
 installdirs-am:
 install: install-recursive
@@ -700,6 +704,18 @@ uninstall-am:
 	maintainer-clean-generic mostlyclean mostlyclean-generic pdf \
 	pdf-am ps ps-am tags tags-recursive uninstall uninstall-am
 
+
+63s-image: 
+	dd if=stage1/stage1 of=$@.$$$$ bs=512 count=1 &&		\
+	dd if=$(srcdir)/stage2/63s_grub_cfg of=$@.$$$$ bs=512 seek=1 count=1 &&	\
+	dd if=stage2/pre_stage2 of=$@.$$$$ bs=512 seek=2 &&		\
+	dd if=/dev/zero of=$@.$$$$ bs=512 seek=160650 count=0 &&		\
+	cp $@.$$$$ $@;								\
+	rm $@.$$$$
+
+PHONY: test
+test: all 
+	$(QEMU) -hda 63s-image -boot c
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

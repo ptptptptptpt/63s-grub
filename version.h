@@ -1,1 +1,0 @@
-#define S63_GRUB_VERSION "V1.0"

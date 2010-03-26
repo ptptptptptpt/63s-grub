@@ -13,7 +13,7 @@ dnl LIABILITY OF ANY KIND FOR ANY DAMAGES WHATSOEVER RESULTING FROM THE
 dnl USE OF THIS SOFTWARE.
 
 AC_PREREQ(2.57)
-AC_INIT([GRUB], [0.97], [bug-grub@gnu.org])
+AC_INIT([63s-GRUB], [1.05], [earthengine@gmail.com])
 AC_CONFIG_SRCDIR([stage2/stage2.c])
 AC_CONFIG_HEADER([config.h])
 AM_INIT_AUTOMAKE
@@ -35,20 +35,35 @@ AC_SUBST(host_vendor)
 #
 
 AM_MAINTAINER_MODE
-if test "x$enable_maintainer_mode" = xyes; then
-  AC_PATH_PROG(PERL,perl)
-  if test -z "$PERL"; then
-    AC_MSG_ERROR([perl not found])
-  fi
+
+AC_PATH_PROG(PERL, perl)
+if test -z "$PERL"; then
+  AC_MSG_ERROR([perl not found])
 fi
+
+AC_ARG_WITH([qemu],
+	[AC_HELP_STRING([--with-qemu], [specify a qemu emulator with full path])])
+
+if test x"$with_qemu" != xno; then
+  $QEMU=$with_qemu
+else
+  $QEMU="no"
+  AC_MSG_WARN([qemu test disabled, you will not be able to run "make test".])
+fi
+
+if test -z "$QEMU"; then
+  AC_PATH_PROG(QEMU, kvm)
+fi
+if test -z "$QEMU"; then
+  AC_PATH_PROG(QEMU, qemu-kvm)
+fi
+if test -z "$QEMU"; then
+  AM_MISSING_PROG(QEMU, qemu)
+fi 
 
 # This should be checked before AC_PROG_CC
 if test "x$CFLAGS" = x; then
   default_CFLAGS=yes
-fi
-
-if test "x$host_cpu" = xx86_64; then
-  CFLAGS="-m32 $CFLAGS"
 fi
 
 #
@@ -225,6 +240,20 @@ AC_CHECK_HEADERS(string.h strings.h ncurses/curses.h ncurses.h curses.h)
 
 # filesystems support.
 
+AC_ARG_ENABLE(reiserfs,
+  [  --enable-reiserfs     enable ReiseFS support in Stage 2])
+
+if test x"$enable_reiserfs" = xyes; then
+  FSYS_CFLAGS="$FSYS_CFLAGS -DFSYS_REISERFS=1"
+fi
+
+AC_ARG_ENABLE(ext2fs,
+  [  --enable-ext2fs        enable ext2fs support in Stage 2])
+
+if test x"$enable_reiserfs" = xyes; then
+  FSYS_CFLAGS="$FSYS_CFLAGS -DFSYS_EXT2FS=1"
+fi
+
 AC_ARG_ENABLE(fat,
   [  --disable-fat           disable FAT support in Stage 2])
 
@@ -240,61 +269,13 @@ if test x"$enable_ntfs" != xno; then
 fi
 
 FSYS_CFLAGS="$FSYS_CFLAGS -DNO_DECOMPRESSION=1"
+GRAPHICS_SUPPORT=0
+HERCULES_SUPPORT=0
+SERIAL_SUPPORT=0
+UUID_SUPPORT=0
 
-AC_ARG_ENABLE(md5-password,
-  [  --disable-md5-password  disable MD5 password support in Stage 2])
-if test "x$enable_md5_password" != xno; then
-  FSYS_CFLAGS="$FSYS_CFLAGS -DUSE_MD5_PASSWORDS=1"
-fi
-
-dnl The netboot support.
-dnl General options.
-AC_ARG_ENABLE(packet-retransmission,
-  [  --disable-packet-retransmission
-                          turn off packet retransmission])
-if test "x$enable_packet_retransmission" != xno; then
-  NET_EXTRAFLAGS="$NET_EXTRAFLAGS -DCONGESTED=1"
-fi
-
-
-
-dnl Check if the netboot support is turned on.
-AM_CONDITIONAL(NETBOOT_SUPPORT, test "x$NET_CFLAGS" != x)
-if test "x$NET_CFLAGS" != x; then
-  FSYS_CFLAGS="$FSYS_CFLAGS -DFSYS_TFTP=1"
-fi
-
-
-dnl Graphical splashscreen support
-AC_ARG_ENABLE(graphics,
-  [  --disable-graphics      disable graphics terminal support])
-AM_CONDITIONAL(GRAPHICS_SUPPORT, test "x$enable_graphics" != xno)
-
-dnl Hercules terminal
-AC_ARG_ENABLE(hercules,
-  [  --disable-hercules      disable hercules terminal support])
-AM_CONDITIONAL(HERCULES_SUPPORT, test "x$enable_hercules" != xno)
-
-dnl Serial terminal
-AC_ARG_ENABLE(serial,
-  [  --disable-serial        disable serial terminal support])
-AM_CONDITIONAL(SERIAL_SUPPORT, test "x$enable_serial" != xno)
-
-dnl UUID scanning
-AC_ARG_ENABLE(uuid,
-  [  --disable-uuid          disable uuid scanning support])
-AM_CONDITIONAL(UUID_SUPPORT, test "x$enable_uuid" != xno)
-
-
-
-dnl Automatic Linux mem= option.
-AC_ARG_ENABLE(auto-linux-mem-opt,
-  [  --disable-auto-linux-mem-opt
-                          don't pass Linux mem= option automatically])
-if test "x$enable_auto_linux_mem_opt" = xno; then
-  :
-else
-  AC_DEFINE(AUTO_LINUX_MEM_OPT, 1, [Define if you don't want to pass the mem= option to Linux])
+if test "x$host_cpu" = xx86_64; then
+  CFLAGS="-m32 $CFLAGS"
 fi
 
 dnl Now substitute the variables.
@@ -306,7 +287,6 @@ AC_SUBST(NETBOOT_DRIVERS)
 dnl Because recent automake complains about CCASFLAGS, set it here.
 CCASFLAGS='$(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)'
 AC_SUBST(CCASFLAGS)
-
 
 dnl Output.
 AC_CONFIG_FILES([Makefile stage1/Makefile stage2/Makefile])
