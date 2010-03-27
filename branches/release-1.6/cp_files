@@ -1,0 +1,11 @@
+#!/bin/sh
+#if [ -d ../63s-grub ]; then
+#    rm ../63s-grub/*
+cp ./stage2/stage2 ./stage1/stage1  ../
+
+set dummy `ls -l ./stage2/stage2`
+echo "$6"
+if [ "$6" -gt 31744 ] ; then
+    echo "警告！stage2 体积超过62扇区！"
+fi
+
