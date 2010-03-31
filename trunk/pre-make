@@ -3,7 +3,6 @@
 aclocal || { echo "1" ;  exit $? ; }
 autoconf || { echo "2" ;  exit $? ; }
 automake -a || { echo "3" ;  exit $? ; }
-./configure --disable-ext2fs --disable-ffs --disable-ufs2 --disable-minix --disable-reiserfs --disable-vstafs --disable-jfs --disable-xfs --disable-gunzip || { echo "4" ;  exit $? ; }
+./configure  || { echo "4" ;  exit $? ; }
 
 
-#  --disable-md5-password   --disable-packet-retransmission  --disable-graphics   --disable-hercules   --disable-serial  --disable-uuid   --disable-auto-linux-mem-opt

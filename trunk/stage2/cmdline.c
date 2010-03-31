@@ -117,7 +117,7 @@ enter_cmdline (char *heap)
   
   console_current_color = ( menu_color & 0xf) ;
   //console_gotoxy (0,0);
-  grub_printf("Builtin commands:\nboot, chainloader, find, map, ntldr, root, rootnoverify, setcolor.\n\nPress ESC to return.\n");
+  grub_printf("Builtin commands: boot, chainloader, find, map, ntldr, root, rootnoverify.\n\nPress ESC to return.\n");
   
   while (1)
     {

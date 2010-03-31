@@ -659,32 +659,6 @@ static struct builtin builtin_find =
 
 
 
-
-/* setcolor */
-static void
-setcolor_func (char *arg, int flags)
-{
-    char* tmp;
-    char* tmp2;
-    tmp = arg;
-    tmp2 = skip_to (0, arg);
-    safe_parse_maxint (&tmp2, &menu_color);
-    safe_parse_maxint (&tmp, &top_end_color);
-    return;
-
-}
-
-static struct builtin builtin_setcolor =
-{
-  "setcolor",
-  setcolor_func,
-  BUILTIN_CMDLINE | BUILTIN_HELP_LIST,
-  " ",
-  " "
-};
-
-
-
 
 
 
@@ -702,8 +676,7 @@ struct builtin *builtin_table[] =
   
   &builtin_root,
   &builtin_rootnoverify,
-  
-  &builtin_setcolor,
+
   
   0
 };
