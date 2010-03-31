@@ -2,7 +2,9 @@
     去除 stage2/version.h；
     版本号升为 1.2；
     去除 setcolor 命令；
-    修改 pre-make。
+    修改 pre-make；
+    改进菜单界面；
+    修正“倒计时结束时，如果默认启动项失败，将陷入死循环”的 bug
 
 
 2010-03-16  pt  <ptptptptptpt@163.com>

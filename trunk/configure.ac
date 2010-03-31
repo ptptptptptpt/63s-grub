@@ -13,7 +13,7 @@ dnl LIABILITY OF ANY KIND FOR ANY DAMAGES WHATSOEVER RESULTING FROM THE
 dnl USE OF THIS SOFTWARE.
 
 AC_PREREQ(2.57)
-AC_INIT([63s-GRUB], [1.2], [earthengine@gmail.com])
+AC_INIT([63s-GRUB], [V1.2], [earthengine@gmail.com])
 AC_CONFIG_SRCDIR([stage2/stage2.c])
 AC_CONFIG_HEADER([config.h])
 AM_INIT_AUTOMAKE

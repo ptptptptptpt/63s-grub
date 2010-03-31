@@ -21,6 +21,7 @@
 #include <term.h>
 
 
+
 char* p_cfg_start = 0x8000;
 char* p_cfg_default_entryno = 0x8000 + 8;
 char* p_cfg_entries_start = 0x8000 + 16;
@@ -64,6 +65,30 @@ print_top_and_end (void)
 
 
 
+
+static void
+print_an_entrie ( char * p, int entry_no)
+{
+    int i=0;
+    grub_printf ( " %d ", entry_no);
+    for (i=0;i<17;i++)
+    {
+        if (*p)
+        {
+            grub_putchar (*p);
+            p++;
+        }
+        else
+        {
+            grub_putchar (' ');
+        }
+    }
+
+
+}
+
+
+
 static void
 print_entries (void)
 {
@@ -73,15 +98,15 @@ print_entries (void)
     console_current_color = menu_color;
     for (entryno=1; entryno<=num_entries; entryno++)
     {
-        console_gotoxy (32, 6 + (entryno-1)*2 );
+        console_gotoxy (31, 6 + (entryno-1)*2 );
         if (entryno == grub_current_entryno)
         {
             console_current_color = ( ( (menu_color & 0x7) << 4) | ( (menu_color >> 4) & 0xf) );
-            grub_printf ( " [%d] %s ", entryno, p_cfg_entries_start + (entryno-1)*80 );
+            print_an_entrie (p_cfg_entries_start + (entryno-1)*80 , entryno );
             console_current_color = menu_color;
         }
         else
-          grub_printf (" [%d] %s ", entryno, p_cfg_entries_start + (entryno-1)*80 );
+            print_an_entrie (p_cfg_entries_start + (entryno-1)*80 , entryno );
     }
 
 }
@@ -90,11 +115,15 @@ print_entries (void)
 
 
 static void
-print_countdown (void)
+countdown ( int show )
 {
     int i;
-    console_gotoxy (3,3);
-    grub_printf (" Autobooting in %d seconds...", grub_timeout);
+    console_gotoxy (53, 6 + (grub_current_entryno-1)*2 );
+    console_current_color = ( menu_color & 0xf );
+    if (show)
+      grub_printf ("%d seconds...", grub_timeout);
+    else
+      for (i=0; i<20; i++) grub_putchar(' ');
 
 }
 
@@ -137,7 +166,7 @@ restart2:
             if (grub_timeout > 0)
             {
                 grub_timeout = -1;
-                goto restart1;
+                countdown (0);
             }
             
             c = ASCII_CHAR (console_getkey ());
@@ -215,6 +244,7 @@ restart2:
           if (grub_timeout == 0) 
           {
                 //启动默认启动项
+                grub_timeout = -1; //若无此句，启动失败后，将陷入死循环。
                 boot_entry (p_cfg_entries_start + (grub_current_entryno-1)*80 ); //若返回，说明执行命令出错，或命令都已成功执行，但未执行 boot。此时返回启动菜单。
                 goto restart1;
           }
@@ -226,7 +256,7 @@ restart2:
               {
                   time2 = time1;
                   grub_timeout--;
-                  print_countdown ();
+                  countdown (1);
               }
           }
 
@@ -292,3 +322,4 @@ cmain (void)
         else run_menu ();
     }
 }
+
