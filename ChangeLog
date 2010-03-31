@@ -1,3 +1,10 @@
+2010-03-31  pt  <ptptptptptpt@163.com>
+    去除 stage2/version.h；
+    版本号升为 1.2；
+    去除 setcolor 命令；
+    修改 pre-make。
+
+
 2010-03-16  pt  <ptptptptptpt@163.com>
     V1.1 清理不必要的文件；修正“设定某些颜色时，菜单被选中项会闪烁”的问题。
 

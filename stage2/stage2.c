@@ -20,8 +20,6 @@
 #include <shared.h>
 #include <term.h>
 
-#include "version.h"
-
 
 char* p_cfg_start = 0x8000;
 char* p_cfg_default_entryno = 0x8000 + 8;
@@ -54,7 +52,7 @@ print_top_and_end (void)
     console_gotoxy (3,1);
     for (i=0;i<74;i++) grub_printf (" ");
     console_gotoxy (34,1);
-    grub_printf ("63S-GRUB " S63_GRUB_VERSION );
+    grub_printf ("63S-GRUB " VERSION );
     
     //打印底栏
     console_gotoxy (3,23);
