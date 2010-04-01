@@ -45,9 +45,9 @@ AC_ARG_WITH([qemu],
 	[AC_HELP_STRING([--with-qemu], [specify a qemu emulator with full path])])
 
 if test x"$with_qemu" != xno; then
-  $QEMU=$with_qemu
+  QEMU=$with_qemu
 else
-  $QEMU="no"
+  QEMU="no"
   AC_MSG_WARN([qemu test disabled, you will not be able to run "make test".])
 fi
 
