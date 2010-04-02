@@ -289,5 +289,5 @@ CCASFLAGS='$(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)'
 AC_SUBST(CCASFLAGS)
 
 dnl Output.
-AC_CONFIG_FILES([Makefile stage1/Makefile stage2/Makefile])
+AC_CONFIG_FILES([Makefile stage1/Makefile stage2/Makefile test/Makefile])
 AC_OUTPUT
