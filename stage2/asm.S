@@ -43,6 +43,9 @@
 #else
 # define	ABS(x)	((x) - EXT_C(main) + 0x8200)
 #endif
+#define 	io_map	0xFC00
+#define		bios_key_map	0xFC80
+#define		ascii_key_map	0xFD00
 	
 	.file	"asm.S"
 
@@ -368,7 +371,7 @@ int1_handler:
 	movw	%ax, %ds
 		
 	/* set %si to the io map */
-	movw	$ABS(EXT_C(io_map)), %si
+	movw	$io_map, %si
 
 		
 9:	/* check if the io map already has the port */
@@ -383,7 +386,7 @@ int1_handler:
 	jmp	8f
 	
 1:	/* check for the buffer overrun */
-	cmpw	$(ABS(EXT_C(io_map)) + (IO_MAP_SIZE + 1) * 2), %si
+	cmpw	$(io_map + (IO_MAP_SIZE + 1) * 2), %si
 	je	8f
 	/* add the port into the io map */
 	movw	%dx, -2(%si)
@@ -399,9 +402,6 @@ int1_handler:
 	
 	.code32
 
-ENTRY(io_map)
-	.space	(IO_MAP_SIZE + 1) * 2
-	
 	
 /*
  * set_int15_handler(void)
@@ -496,7 +496,7 @@ int15_skip_flag:
 	xorw	%ax, %ax
 	movw	%ax, %ds
 	/* set %si to the key map */
-	movw	$ABS(EXT_C(bios_key_map)), %si
+	movw	$bios_key_map, %si
 
 	/* find the key code from the key map */
 2:
@@ -534,15 +534,6 @@ int15_offset:	.word	0
 int15_segment:	.word	0
 
 	.code32
-
-	.align	4	
-ENTRY(bios_key_map)
-	.space	(KEY_MAP_SIZE + 1) * 2
-	
-	
-
-
-
 
 /*
  * set_int13_handler(map)
@@ -1720,7 +1711,7 @@ translate_keycode:
 remap_ascii_char:
 	pushw	%si
 	
-	movw	$ABS(EXT_C(ascii_key_map)), %si
+	movw	$ascii_key_map, %si
 1:
 	lodsw
 	/* check if this is the end */
@@ -1738,11 +1729,6 @@ remap_ascii_char:
 	ret
 
 	.code32
-
-	.align	4
-ENTRY(ascii_key_map)
-	.space	(KEY_MAP_SIZE + 1) * 2
-	
 
 /*
  * int console_getkey (void)

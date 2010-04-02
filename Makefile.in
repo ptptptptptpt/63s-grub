@@ -704,11 +704,12 @@ uninstall-am:
 
 
 63s-image: all
-	dd if=stage1/stage1 of=$@.$$$$ bs=512 count=1 &&		\
-	dd if=$(srcdir)/stage2/63s_grub_cfg of=$@.$$$$ bs=512 seek=1 count=1 &&	\
-	dd if=stage2/pre_stage2 of=$@.$$$$ bs=512 seek=2 &&		\
-	dd if=/dev/zero of=$@.$$$$ bs=512 seek=160650 count=0 &&		\
-	cp $@.$$$$ $@;								\
+	bzcat $(top_srcdir)/test/$@.bz2 > $@.$$$$ &&						\
+	dd conv=notrunc if=stage1/stage1 of=$@.$$$$ bs=512 count=1 &&				\
+	dd conv=notrunc if=$(srcdir)/stage2/63s_grub_cfg of=$@.$$$$ bs=512 seek=1 count=1 &&	\
+	dd conv=notrunc if=stage2/pre_stage2 of=$@.$$$$ bs=512 seek=2 count=61 &&		\
+	fdisk $@.$$$$ < $(top_srcdir)/test/fdisk.cmd &&						\
+	cp $@.$$$$ $@;										\
 	rm $@.$$$$
 
 PHONY: test clean-local
