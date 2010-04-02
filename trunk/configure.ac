@@ -250,7 +250,7 @@ fi
 AC_ARG_ENABLE(ext2fs,
   [  --enable-ext2fs        enable ext2fs support in Stage 2])
 
-if test x"$enable_reiserfs" = xyes; then
+if test x"$enable_ext2fs" = xyes; then
   FSYS_CFLAGS="$FSYS_CFLAGS -DFSYS_EXT2FS=1"
 fi
 

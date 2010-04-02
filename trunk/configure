@@ -5863,7 +5863,7 @@ if test "${enable_ext2fs+set}" = set; then :
 fi
 
 
-if test x"$enable_reiserfs" = xyes; then
+if test x"$enable_ext2fs" = xyes; then
   FSYS_CFLAGS="$FSYS_CFLAGS -DFSYS_EXT2FS=1"
 fi
 

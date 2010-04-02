@@ -555,9 +555,9 @@ void unset_int15_handler (void);
 void track_int13 (int drive);
 
 /* The key map.  */
-extern unsigned short bios_key_map[];
-extern unsigned short ascii_key_map[];
-extern unsigned short io_map[];
+#define bios_key_map ((unsigned short *)0xFC80)
+#define ascii_key_map ((unsigned short *)0xFD00)
+#define io_map	((unsigned short *)0xFC00)
 
 /* calls for direct boot-loader chaining */
 void chain_stage1 (unsigned long segment, unsigned long offset,
