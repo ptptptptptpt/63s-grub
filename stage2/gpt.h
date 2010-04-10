@@ -58,7 +58,7 @@ struct grub_gpt_partentry
   char name[72];
 } __attribute__ ((packed));
 
-#define GPT_HEADER_MAGIC       0x5452415020494645UL
+#define GPT_HEADER_MAGIC       0x5452415020494645ULL
 
 #define	GPT_ENTRY_SECTOR(size,entry)					\
 	((((entry) * (size) + 1) & ~(SECTOR_SIZE - 1)) >> SECTOR_BITS)

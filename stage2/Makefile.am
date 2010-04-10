@@ -5,7 +5,7 @@ noinst_HEADERS =  \
 	     mb_header.h mb_info.h  \
 	  pc_slice.h   shared.h   term.h gpt.h
 
-EXTRA_DIST = setjmp.S apm.S $(noinst_SCRIPTS) 63s_grub_cfg
+EXTRA_DIST = setjmp.S $(noinst_SCRIPTS) 63s_grub_cfg
 
 # For <stage1.h>.
 INCLUDES = -I$(top_srcdir)/stage1

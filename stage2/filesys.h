@@ -20,26 +20,6 @@
 
 #include "pc_slice.h"
 
-#ifdef FSYS_FFS
-#define FSYS_FFS_NUM 1
-int ffs_mount (void);
-int ffs_read (char *buf, int len);
-int ffs_dir (char *dirname);
-int ffs_embed (int *start_sector, int needed_sectors);
-#else
-#define FSYS_FFS_NUM 0
-#endif
-
-#ifdef FSYS_UFS2
-#define FSYS_UFS2_NUM 1
-int ufs2_mount (void);
-int ufs2_read (char *buf, int len);
-int ufs2_dir (char *dirname);
-int ufs2_embed (int *start_sector, int needed_sectors);
-#else
-#define FSYS_UFS2_NUM 0
-#endif
-
 #ifdef FSYS_FAT
 #define FSYS_FAT_NUM 1
 int fat_mount (void);
@@ -52,7 +32,7 @@ int fat_dir (char *dirname);
 #ifdef FSYS_NTFS
 #define FSYS_NTFS_NUM 1
 int ntfs_mount (void);
-unsigned long ntfs_read (char *buf, unsigned long len, unsigned long write);
+int ntfs_read (char *buf, int len);
 int ntfs_dir (char *dirname);
 #else
 #define FSYS_NTFS_NUM 0
@@ -67,15 +47,6 @@ int ext2fs_dir (char *dirname);
 #define FSYS_EXT2FS_NUM 0
 #endif
 
-#ifdef FSYS_MINIX
-#define FSYS_MINIX_NUM 1
-int minix_mount (void);
-int minix_read (char *buf, int len);
-int minix_dir (char *dirname);
-#else
-#define FSYS_MINIX_NUM 0
-#endif
-
 #ifdef FSYS_REISERFS
 #define FSYS_REISERFS_NUM 1
 int reiserfs_mount (void);
@@ -86,58 +57,10 @@ int reiserfs_embed (int *start_sector, int needed_sectors);
 #define FSYS_REISERFS_NUM 0
 #endif
 
-#ifdef FSYS_VSTAFS
-#define FSYS_VSTAFS_NUM 1
-int vstafs_mount (void);
-int vstafs_read (char *buf, int len);
-int vstafs_dir (char *dirname);
-#else
-#define FSYS_VSTAFS_NUM 0
-#endif
-
-#ifdef FSYS_JFS
-#define FSYS_JFS_NUM 1
-int jfs_mount (void);
-int jfs_read (char *buf, int len);
-int jfs_dir (char *dirname);
-int jfs_embed (int *start_sector, int needed_sectors);
-#else
-#define FSYS_JFS_NUM 0
-#endif
-
-#ifdef FSYS_XFS
-#define FSYS_XFS_NUM 1
-int xfs_mount (void);
-int xfs_read (char *buf, int len);
-int xfs_dir (char *dirname);
-#else
-#define FSYS_XFS_NUM 0
-#endif
-
-#ifdef FSYS_TFTP
-#define FSYS_TFTP_NUM 1
-int tftp_mount (void);
-int tftp_read (char *buf, int len);
-int tftp_dir (char *dirname);
-void tftp_close (void);
-#else
-#define FSYS_TFTP_NUM 0
-#endif
-
-#ifdef FSYS_ISO9660
-#define FSYS_ISO9660_NUM 1
-int iso9660_mount (void);
-int iso9660_read (char *buf, int len);
-int iso9660_dir (char *dirname);
-#else
-#define FSYS_ISO9660_NUM 0
-#endif
-
 #ifndef NUM_FSYS
 #define NUM_FSYS	\
-  (FSYS_FFS_NUM + FSYS_FAT_NUM + FSYS_NTFS_NUM + FSYS_EXT2FS_NUM + FSYS_MINIX_NUM	\
-   + FSYS_REISERFS_NUM + FSYS_VSTAFS_NUM + FSYS_JFS_NUM + FSYS_XFS_NUM	\
-   + FSYS_TFTP_NUM + FSYS_ISO9660_NUM + FSYS_UFS2_NUM)
+  (FSYS_FAT_NUM + FSYS_NTFS_NUM 		\
+   + FSYS_EXT2FS_NUM + FSYS_REISERFS_NUM)
 #endif
 
 /* defines for the block filesystem info area */

@@ -48,7 +48,6 @@ if test x"$with_qemu" != xno; then
   QEMU=$with_qemu
 else
   QEMU="no"
-  AC_MSG_WARN([qemu test disabled, you will not be able to run "make test".])
 fi
 
 if test -z "$QEMU"; then
@@ -58,8 +57,14 @@ if test -z "$QEMU"; then
   AC_PATH_PROG(QEMU, qemu-kvm)
 fi
 if test -z "$QEMU"; then
-  AM_MISSING_PROG(QEMU, qemu)
-fi 
+  AC_PATH_PROG(QEMU, qemu)
+fi
+if test -z "$QEMU"; then
+  QEMU="no"
+fi
+if test x$QEMU == xno; then
+  AC_MSG_WARN([qemu test disabled, you will not be able to run "make test".])
+fi
 
 # This should be checked before AC_PROG_CC
 if test "x$CFLAGS" = x; then
@@ -274,6 +279,7 @@ HERCULES_SUPPORT=0
 SERIAL_SUPPORT=0
 UUID_SUPPORT=0
 
+CFLAGS="-Wall -Werror $CFLAGS"
 if test "x$host_cpu" = xx86_64; then
   CFLAGS="-m32 $CFLAGS"
 fi

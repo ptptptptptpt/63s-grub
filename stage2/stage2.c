@@ -20,28 +20,26 @@
 #include <shared.h>
 #include <term.h>
 
+#define max_entries 6
 
+struct cfg_header {
+  int timeout;
+  int current_entryno;
+  int top_end_color;
+  int menu_color;
+  char **menuitems[max_entries];
+};
 
-char* p_cfg_start = 0x8000;
-char* p_cfg_default_entryno = 0x8000 + 8;
-char* p_cfg_entries_start = 0x8000 + 16;
+int num_entries = 0;
+int grub_current_entryno = 0;
+int menu_color;
+int grub_timeout;
 
-char* p_cfg_top_end_color = 0x8000 + 3;
-char* p_cfg_menu_color = 0x8000 + 11;
+struct cfg_header *p_cfg = (struct cfg_header *)0x8000;
 
 char* heap; //作为缓存
 
-int grub_timeout = -1;
-int grub_current_entryno = 1;
-int num_entries = 0;
-
-int top_end_color = 0x20;     //顶部和底部的颜色
-int menu_color = 0x17;     //菜单颜色
-
-
 grub_jmp_buf restart_env;
-
-
 
 static void
 print_top_and_end (void)
@@ -49,7 +47,7 @@ print_top_and_end (void)
     int i;
 
     //打印顶栏
-    console_current_color = top_end_color ;
+    console_current_color = p_cfg->top_end_color ;
     console_gotoxy (3,1);
     for (i=0;i<74;i++) grub_printf (" ");
     console_gotoxy (34,1);
@@ -67,7 +65,7 @@ print_top_and_end (void)
 
 
 static void
-print_an_entrie ( char * p, int entry_no)
+print_an_entry ( char * p, int entry_no)
 {
     int i=0;
     grub_printf ( " %d ", entry_no);
@@ -83,8 +81,6 @@ print_an_entrie ( char * p, int entry_no)
             grub_putchar (' ');
         }
     }
-
-
 }
 
 
@@ -96,23 +92,21 @@ print_entries (void)
 
     //逐条打印启动项
     console_current_color = menu_color;
+
     for (entryno=1; entryno<=num_entries; entryno++)
     {
         console_gotoxy (31, 6 + (entryno-1)*2 );
         if (entryno == grub_current_entryno)
         {
             console_current_color = ( ( (menu_color & 0x7) << 4) | ( (menu_color >> 4) & 0xf) );
-            print_an_entrie (p_cfg_entries_start + (entryno-1)*80 , entryno );
+            print_an_entry (p_cfg->menuitems[entryno-1][0] , entryno );
             console_current_color = menu_color;
         }
         else
-            print_an_entrie (p_cfg_entries_start + (entryno-1)*80 , entryno );
+            print_an_entry (p_cfg->menuitems[entryno-1][0] , entryno );
     }
 
 }
-
-
-
 
 static void
 countdown ( int show )
@@ -135,12 +129,13 @@ boot_entry (char *entry)
     console_cls ();
     console_current_color = 0x7;
     grub_printf ("Booting %s ...\n\n");
-    if ( run_script (entry+16, heap) ) //如果执行命令出错，或命令都已成功执行 但未执行 boot
+    if ( run_script (entry, heap) ) //如果执行命令出错，或命令都已成功执行 但未执行 boot
     {
         grub_printf ("\nPress any key...");
         (void) console_getkey ();
         return 1;
     }
+    return 0;
 }
 
 
@@ -151,7 +146,7 @@ run_menu (void)
 {
     char c;
     int time1, time2 = -1;
-    char* tmp;
+    int tmp;
     
 restart1:
     console_cls ();
@@ -171,9 +166,9 @@ restart2:
             
             c = ASCII_CHAR (console_getkey ());
             
-            if ( (c >= 0x31) && (c <= num_entries + 0x30) )
+            if ( (c >= '1') && (c <= '0' + num_entries) )
             {
-                grub_current_entryno = c - 0x30;
+                grub_current_entryno = c - '0';
                 goto restart2;
             }
             
@@ -188,13 +183,9 @@ restart2:
             {
                 console_cls ();
                 console_gotoxy (0, 0 );
-                tmp = p_cfg_entries_start + (grub_current_entryno-1)*80;
-                //grub_printf ("[%d] %s\n\n", grub_current_entryno, tmp);
-                tmp += 16;
-                while(*(tmp))
+                for(tmp=1;p_cfg->menuitems[grub_current_entryno-1][tmp]!=NULL;++tmp)
                 {
-                    grub_printf ("%s\n", tmp);
-                    while(*(tmp++)) ;
+                    grub_printf ("%s\n", p_cfg->menuitems[grub_current_entryno-1][tmp]);
                 }
                 
                 grub_printf ("\n\nPress any key...");
@@ -234,7 +225,7 @@ restart2:
             
             else if ( (c == '\n' ) || (c == '\r') ) //启动
             {
-                boot_entry (p_cfg_entries_start + (grub_current_entryno-1)*80 );//若返回，说明执行命令出错，或命令都已成功执行，但未执行 boot。此时返回启动菜单。
+                boot_entry (p_cfg->menuitems[grub_current_entryno-1][1]);//若返回，说明执行命令出错，或命令都已成功执行，但未执行 boot。此时返回启动菜单。
                 goto restart1;
             }
             else 
@@ -245,7 +236,7 @@ restart2:
           {
                 //启动默认启动项
                 grub_timeout = -1; //若无此句，启动失败后，将陷入死循环。
-                boot_entry (p_cfg_entries_start + (grub_current_entryno-1)*80 ); //若返回，说明执行命令出错，或命令都已成功执行，但未执行 boot。此时返回启动菜单。
+                boot_entry (p_cfg->menuitems[grub_current_entryno-1][1]); //若返回，说明执行命令出错，或命令都已成功执行，但未执行 boot。此时返回启动菜单。
                 goto restart1;
           }
           
@@ -291,31 +282,17 @@ cmain (void)
   /* Never return.  */
   for (;;)
     {
-        char* tmp;
-        tmp = p_cfg_entries_start;
         
         reset ();
         console_cls ();
-
-        if (*p_cfg_start)
-          safe_parse_maxint (&p_cfg_start, &grub_timeout);
-        if (grub_timeout > 0) grub_timeout++; //若无此步，倒计时会少显示一秒。
-
-        if (*p_cfg_default_entryno)
-          safe_parse_maxint (&p_cfg_default_entryno, &grub_current_entryno); //读取默认启动序号
-
-        if (*p_cfg_top_end_color)
-          safe_parse_maxint (&p_cfg_top_end_color, &top_end_color); //读取颜色
-        
-        if (*p_cfg_menu_color)
-          safe_parse_maxint (&p_cfg_menu_color, &menu_color);
-
+	grub_current_entryno = p_cfg->current_entryno;
+	grub_timeout = p_cfg->timeout;
+        menu_color = p_cfg->menu_color;
 
         //数一数有几个启动项
-        while( num_entries <= 6 && *(tmp) )
+        while( num_entries < max_entries && p_cfg->menuitems[num_entries]!=NULL)
         {
             num_entries++;
-            tmp += 80;
         }
         
         if (! num_entries) enter_cmdline (heap);

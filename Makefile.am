@@ -3,25 +3,30 @@ AUTOMAKE_OPTIONS = 1.7 gnu
 
 SUBDIRS = stage2 stage1 test
 
+EXTRA_DIST = BUGS MAINTENANCE tools/menuc.c tools/test.menu
 
-EXTRA_DIST = BUGS MAINTENANCE
+PHONY: test clean-local imageupdate
 
-63s-image: all
-	bzcat $(top_srcdir)/test/$@.bz2 > $@.$$$$ &&						\
-	dd conv=notrunc if=stage1/stage1 of=$@.$$$$ bs=512 count=1 &&				\
-	dd conv=notrunc if=$(srcdir)/stage2/63s_grub_cfg of=$@.$$$$ bs=512 seek=1 count=1 &&	\
-	dd conv=notrunc if=stage2/pre_stage2 of=$@.$$$$ bs=512 seek=2 count=61 &&		\
-	fdisk $@.$$$$ < $(top_srcdir)/test/fdisk.cmd &&						\
-	cp $@.$$$$ $@;										\
-	rm $@.$$$$
+stage1/stage1 stage2/stage2: all
 
-PHONY: test clean-local
-test: 63s-image
+IMAGE = 63s-image
+
+$(IMAGE): $(top_srcdir)/test/$(IMAGE).bz2
+	@echo "Unpacking 63s-image..."
+	@bzcat $(top_srcdir)/test/$@.bz2 > $@
+
+imageupdate: stage1/stage1 stage2/stage2 $(IMAGE)
+	@echo "Updating 63s-image..."
+	@dd conv=notrunc if=stage1/stage1 of=$(IMAGE) bs=1 count=440 &&		\
+	dd conv=notrunc if=stage2/stage2 of=$(IMAGE) bs=512 seek=1 count=62
+
+test: imageupdate
+	@echo "Running QEMU..."
 	@if [ x$(QEMU) = xno ] ; then			\
 		echo "You have disabled QEMU support or qemu was not detected; try --with-qemu=(full path of qemu) when calling configure.";	\
 		false;					\
 	fi
-	$(QEMU) -hda 63s-image -boot c
+	@$(QEMU) -hda 63s-image -boot c
 
 clean-local:
-	rm 63s-image
+	@rm 63s-image
