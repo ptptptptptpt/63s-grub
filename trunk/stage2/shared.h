@@ -424,9 +424,9 @@ typedef enum
 extern unsigned long install_partition;
 extern unsigned long boot_drive;
 extern unsigned long install_second_sector;
-extern struct apm_info apm_bios_info;
+//extern struct apm_info apm_bios_info;
 extern unsigned long boot_part_addr;
-extern int saved_entryno;
+//extern int saved_entryno;
 extern unsigned char force_lba;
 extern char version_string[];
 extern char config_file[];
@@ -524,35 +524,32 @@ extern grub_error_t errnum;
 extern char *err_list[];
 
 /* Simplify declaration of entry_addr. */
-typedef void (*entry_func) (int, int, int, int, int, int)
-     __attribute__ ((noreturn));
-
-extern entry_func entry_addr;
 
 /* Enter the stage1.5/stage2 C code after the stack is set up. */
 void cmain (void);
 
 /* Halt the processor (called after an unrecoverable error). */
-void stop (void) __attribute__ ((noreturn));
+//void stop (void) __attribute__ ((noreturn));
 
 /* Reboot the system.  */
-void grub_reboot (void) __attribute__ ((noreturn));
+//void grub_reboot (void) __attribute__ ((noreturn));
 
 /* Halt the system, using APM if possible. If NO_APM is true, don't use
    APM even if it is available.  */
-void grub_halt (int no_apm) __attribute__ ((noreturn));
+//void grub_halt (int no_apm) __attribute__ ((noreturn));
 
 /* Copy MAP to the drive map and set up int13_handler.  */
 void set_int13_handler (unsigned short *map);
 
 /* Set up int15_handler.  */
-void set_int15_handler (void);
+//void set_int15_handler (void);
 
 /* Restore the original int15 handler.  */
-void unset_int15_handler (void);
+//void unset_int15_handler (void);
+#define unset_int15_handler(x)
 
 /* Track the int13 handler to probe I/O address space.  */
-void track_int13 (int drive);
+//void track_int13 (int drive);
 
 /* The key map.  */
 #define bios_key_map ((unsigned short *)0xFC80)
@@ -563,18 +560,18 @@ void track_int13 (int drive);
 void chain_stage1 (unsigned long segment, unsigned long offset,
 		   unsigned long part_table_addr)
      __attribute__ ((noreturn));
-void chain_stage2 (unsigned long segment, unsigned long offset,
-		   int second_sector)
-     __attribute__ ((noreturn));
+//void chain_stage2 (unsigned long segment, unsigned long offset,
+//		   int second_sector)
+//     __attribute__ ((noreturn));
 
 /* do some funky stuff, then boot linux */
-void linux_boot (void) __attribute__ ((noreturn));
+//void linux_boot (void) __attribute__ ((noreturn));
 
 /* do some funky stuff, then boot bzImage linux */
-void big_linux_boot (void) __attribute__ ((noreturn));
+//void big_linux_boot (void) __attribute__ ((noreturn));
 
 /* booting a multiboot executable */
-void multi_boot (int start, int mb_info) __attribute__ ((noreturn));
+//void multi_boot (int start, int mb_info) __attribute__ ((noreturn));
 
 /* If LINEAR is nonzero, then set the Intel processor to linear mode.
    Otherwise, bit 20 of all memory accesses is always forced to zero,
@@ -597,7 +594,7 @@ int get_mmap_entry (struct mmar_desc *desc, int cont);
 unsigned long get_rom_config_table (void);
 
 /* Get APM BIOS information.  */
-void get_apm_info (void);
+//void get_apm_info (void);
 
 
 
@@ -606,20 +603,20 @@ int get_code_end (void);
 
 /* low-level timing info */
 int getrtsecs (void);
-int currticks (void);
+//int currticks (void);
 
 
 
 /* Get the current cursor position (where 0,0 is the top left hand
    corner of the screen).  Returns packed values, (RET >> 8) is x,
    (RET & 0xff) is y. */
-int console_getxy (void);
-void console_putchar (int c);
-int console_getkey (void);
-int console_checkkey (void);
-void console_gotoxy(int x, int y);
-void console_cls (void);
-int console_setcursor (int on);
+//int console_getxy (void);
+//void console_putchar (int c);
+//int console_getkey (void);
+//int console_checkkey (void);
+//void console_gotoxy(int x, int y);
+//void console_cls (void);
+//int console_setcursor (int on);
 
 
 
@@ -633,7 +630,7 @@ void grub_putchar (int c);
 int get_diskinfo (int drive, struct geometry *geometry);
 int biosdisk (int subfunc, int drive, struct geometry *geometry,
 	      int sector, int nsec, int segment);
-void stop_floppy (void);
+//void stop_floppy (void);
 
 /* Command-line interface functions. */
 #ifndef STAGE1_5
@@ -685,10 +682,10 @@ extern int grub_timeout;
 
 
 void init_builtins (void);
-void init_config (void);
+//void init_config (void);
 char *skip_to (int after_equal, char *cmdline);
 struct builtin *find_command (char *command);
-void print_cmdline_message ();
+//void print_cmdline_message ();
 void enter_cmdline (char *heap);
 int run_script (char *script, char *heap);
 #endif
@@ -731,7 +728,7 @@ extern grub_jmp_buf restart_env;
 extern grub_jmp_buf restart_cmdline_env;
 
 /* misc */
-void init_page (void);
+//void init_page (void);
 void print_error (void);
 char *convert_to_ascii (char *buf, int c, unsigned long num);
 int get_cmdline (char *prompt, char *cmdline, int maxlen,
@@ -799,8 +796,6 @@ int print_completions (int is_filename, int is_completion);
 void copy_current_part_entry (char *buf);
 
 #ifndef STAGE1_5
-void bsd_boot (kernel_t type, int bootdev, char *arg)
-     __attribute__ ((noreturn));
 
 /* Define flags for load_image here.  */
 /* Don't pass a Linux's mem option automatically.  */

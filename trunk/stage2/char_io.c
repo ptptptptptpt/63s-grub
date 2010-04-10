@@ -26,9 +26,7 @@
 #ifndef STAGE1_5
 
 
-int max_lines = 24;
-int count_lines = -1;
-int use_pager = 1;
+static int max_lines = 24;
 #endif
 
 void
@@ -113,7 +111,7 @@ grub_printf (const char *format,...)
 	  case 'X':
 #endif
 	  case 'u':
-	    *convert_to_ascii (str, c, va_arg(dataptr, unsigned long *)) = 0;
+	    *convert_to_ascii (str, c, va_arg(dataptr, unsigned long)) = 0;
 	    grub_putstr (str);
 	    break;
 
@@ -151,7 +149,7 @@ grub_sprintf (char *buffer, const char *format, ...)
 	switch (c = *(format++))
 	  {
 	  case 'd': case 'u': case 'x':
-	    *convert_to_ascii (str, c, va_arg(dataptr, unsigned long *)) = 0;
+	    *convert_to_ascii (str, c, va_arg(dataptr, unsigned long)) = 0;
 
 	    ptr = str;
 
@@ -847,7 +845,7 @@ grub_putchar (int c)
   if (c == '\n')
     grub_putchar ('\r');
 
-  else if (c == '\t' && console_getxy)
+  else if (c == '\t')
     {
       int n;
       

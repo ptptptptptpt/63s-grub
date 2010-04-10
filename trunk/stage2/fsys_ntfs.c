@@ -181,7 +181,7 @@ static int fixup(char* buf,int len,char* magic)
 }
 
 static int read_mft(char* cur_mft,unsigned long mftno);
-static int read_attr(char* cur_mft,char* dest,unsigned long ofs,unsigned long len,int cached,unsigned long write);
+static int read_attr(char* cur_mft,char* dest,unsigned long ofs,unsigned long len,int cached, unsigned long write);
 static int read_data(char* cur_mft,char* pa,char* dest,unsigned long ofs,unsigned long len,int cached,unsigned long write);
 
 static void init_attr(char* cur_mft)
@@ -377,7 +377,7 @@ back:
       cur_mft=ctx->mft;
       if ((cur_mft) && (get_aflag(AF_ALST)))
         {
-          void (*save_hook)(unsigned long, unsigned long, unsigned long);
+          void (*save_hook)(int, int, int);
 
           save_hook=disk_read_func;
           disk_read_func=NULL;
@@ -1047,7 +1047,7 @@ error:
  * converted. The caller should asure there is enough room in the UTF8 buffer.
  *
  */
-void
+static void
 unicode_to_utf8 (unsigned short *filename, unsigned char *utf8, unsigned long n)
 {
 	unsigned short uni;
@@ -1417,7 +1417,7 @@ int ntfs_dir (char *dirname)
   return ret;
 }
 
-unsigned long ntfs_read(char *buf, unsigned long len, unsigned long write)
+int ntfs_read(char *buf, int len)
 {
   char *cur_mft;
 
@@ -1428,7 +1428,7 @@ unsigned long ntfs_read(char *buf, unsigned long len, unsigned long write)
   if (disk_read_hook)
     save_pos=1;
 
-  if (! read_attr(cmft,buf,filepos,len,1,write))
+  if (! read_attr(cmft,buf,filepos,len,1,0))
     goto error;
 
   filepos+=len;

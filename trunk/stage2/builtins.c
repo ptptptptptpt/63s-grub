@@ -60,7 +60,6 @@ static unsigned short bios_drive_map[DRIVE_MAP_SIZE + 1];
 
 
 static long chainloader_edx = 0;
-static int chainloader_edx_set = 0;
 
 extern unsigned short chain_load_segment;//0x0000;
 extern unsigned short chain_load_offset;//0x7c00;
@@ -91,8 +90,6 @@ init_builtins (void)
 static int
 boot_func (char *arg, int flags)
 {
-   unsigned long read_length;
-  
   /* Clear the int15 handler if we can boot the kernel successfully.
      This assumes that the boot code never fails only if KERNEL_TYPE is
      not KERNEL_TYPE_NONE. Is this assumption is bad?  */

@@ -2764,8 +2764,6 @@ if test x"$with_qemu" != xno; then
   QEMU=$with_qemu
 else
   QEMU="no"
-  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: qemu test disabled, you will not be able to run \"make test\"." >&5
-$as_echo "$as_me: WARNING: qemu test disabled, you will not be able to run \"make test\"." >&2;}
 fi
 
 if test -z "$QEMU"; then
@@ -2853,9 +2851,53 @@ fi
 
 fi
 if test -z "$QEMU"; then
+  # Extract the first word of "qemu", so it can be a program name with args.
+set dummy qemu; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_path_QEMU+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $QEMU in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_QEMU="$QEMU" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_QEMU="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
 
-QEMU=${QEMU-"${am_missing_run}qemu"}
+  ;;
+esac
+fi
+QEMU=$ac_cv_path_QEMU
+if test -n "$QEMU"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $QEMU" >&5
+$as_echo "$QEMU" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
 
+
+fi
+if test -z "$QEMU"; then
+  QEMU="no"
+fi
+if test x$QEMU == xno; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: qemu test disabled, you will not be able to run \"make test\"." >&5
+$as_echo "$as_me: WARNING: qemu test disabled, you will not be able to run \"make test\"." >&2;}
 fi
 
 # This should be checked before AC_PROG_CC
@@ -5893,6 +5935,7 @@ HERCULES_SUPPORT=0
 SERIAL_SUPPORT=0
 UUID_SUPPORT=0
 
+CFLAGS="-Wall -Werror $CFLAGS"
 if test "x$host_cpu" = xx86_64; then
   CFLAGS="-m32 $CFLAGS"
 fi

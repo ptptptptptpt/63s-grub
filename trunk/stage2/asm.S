@@ -55,7 +55,6 @@
 	   in real mode. */
 	.code16
 
-#ifndef STAGE1_5
 	/* 
 	 * In stage2, do not link start.S with the rest of the source
 	 * files directly, so define the start symbols here just to
@@ -64,7 +63,6 @@
 	.globl	start, _start
 start:
 _start:
-#endif /* ! STAGE1_5 */
 	
 ENTRY(main)
 	/*
@@ -90,28 +88,16 @@ ENTRY(main)
 
 VARIABLE(install_partition)
 	.long	0xFFFFFF
-/* This variable is here only because of a historical reason.  */
-VARIABLE(saved_entryno)
-	.long	0
-VARIABLE(stage2_id)
-	.byte	STAGE2_ID
 VARIABLE(force_lba)
 	.byte	0
 VARIABLE(version_string)
 	.string VERSION
-VARIABLE(config_file)
-#ifndef STAGE1_5
-	.string "/boot/grub/menu.lst"
-#else   /* STAGE1_5 */
-	.long	0xffffffff
-	.string "/boot/grub/stage2"
-#endif  /* STAGE1_5 */
 
 	/*
 	 *  Leave some breathing room for the config file name.
 	 */
 
-	. = EXT_C(main) + 0x70
+//	. = EXT_C(main) + 0x70
 
 /* the real mode code continues... */
 codestart:
@@ -1207,7 +1193,6 @@ probe_values:
 /* Source files are splitted, as they have different copyrights.  */
 #ifndef STAGE1_5
 # include "setjmp.S"
-# include "apm.S"
 #endif /* ! STAGE1_5 */
 		
 	

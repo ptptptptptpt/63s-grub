@@ -1,0 +1,28 @@
+9
+1
+32
+24
+hd(0,0)+1
+chainloader (hd0,0)+1
+
+GRUB4DOS
+ntldr hd(0,0)/grub4dos/grldr
+boot
+
+Windows XP
+root (hd0,0)
+ntldr /ntldr
+boot
+
+WinPE
+ntldr (hd0,0)/MiniPE/LDRXPE
+boot
+
+Windows 7
+find --set-root /bootmgr
+ntldr /bootmgr
+
+Boot (hd1)
+map (hd0) (hd1)
+map (hd1) (hd0)
+chainloader (hd1)+1
