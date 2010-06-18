@@ -1,3 +1,17 @@
+2010-06-18  pt  <ptptptptptpt@163.com>
+    r15
+    删除 multiboot 相关代码，以及不再需要的函数；
+    heap 指向 MENU_BUF；
+    删除 map 命令。
+    已可容纳 ext2fs 。
+    
+    r16
+    新增 loadgrub 命令
+    默认包含 ext2fs
+    版本号升为 2.0
+    
+    
+
 2010-03-31  pt  <ptptptptptpt@163.com>
     去除 stage2/version.h；
     版本号升为 1.2；
