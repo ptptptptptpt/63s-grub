@@ -131,7 +131,31 @@ boot_func (char *arg, int flags)
       */
       ((void (*)(void))HMA_ADDR)();  /* no return */
       break;
-        
+
+    case KERNEL_TYPE_GRUB:
+      /* stage2 / core.img */
+      gateA20 (0);
+      boot_drive = saved_drive;
+      
+      chain_ebx = boot_drive;
+      chain_ebx_set = 1;
+      chain_edx = boot_drive;
+      chain_edx_set = 1;
+      //chain_enable_gateA20 = 1;
+      chain_load_segment = 0;
+      chain_load_offset = 0x8000;
+      chain_boot_CS = 0;
+      chain_boot_IP = 0x8200;
+      /* move the code to a safe place at 0x2B0000 */
+      grub_memmove((char *)HMA_ADDR, HMA_start, 0x200/*0xfff0*/);
+      /* Jump to high memory area. This will move boot code at
+      * 0x200000 to the destination load-segment:load-offset;
+      * setup edx and ebx registers; switch to real mode;
+      * and jump to boot-cs:boot-ip.
+      */
+      ((void (*)(void))HMA_ADDR)();  /* no return */
+      break;
+
     default:
       errnum = ERR_BOOT_COMMAND;
       return 1;
@@ -230,12 +254,9 @@ static struct builtin builtin_chainloader =
 
 
 static int
-ntldr_func (char *arg, int flags)
+read_file (char *arg)
 {
-    kernel_type = KERNEL_TYPE_NTLDR;
     int len;
-    
-    // 读取 ntldr 文件
     if (! grub_open (arg))
     {
         kernel_type = KERNEL_TYPE_NONE;
@@ -250,13 +271,58 @@ ntldr_func (char *arg, int flags)
         grub_close ();
         kernel_type = KERNEL_TYPE_NONE;
         if (errnum == ERR_NONE)    errnum = ERR_READ;
-        return 1;
+        return 0;
      }
     else
     {
         grub_printf("File lenth : %x \n", len);
     }
     grub_close ();
+    
+    grub_printf("%s loaded.\n", arg );
+    chain_load_length = len;
+    
+    return 1; 
+}
+
+
+
+
+
+static int
+loadgrub_func (char *arg, int flags)
+{
+    
+    kernel_type = KERNEL_TYPE_GRUB;
+    
+    read_file (arg);
+    
+    //grub_printf("Will boot %s from drive=0x%x, partition=0x%x(hidden sectors=0x%x)\n", arg, current_drive, ((current_partition >> 16) & 0xff), (long)part_start);
+
+    return 1; 
+    
+}
+
+
+static struct builtin builtin_loadgrub =
+{
+  "loadgrub",
+  loadgrub_func,
+  BUILTIN_CMDLINE | BUILTIN_HELP_LIST,
+  " ",
+  " "
+};
+
+
+
+
+
+static int
+ntldr_func (char *arg, int flags)
+{
+    kernel_type = KERNEL_TYPE_NTLDR;
+    
+    read_file (arg);
     
     //读取BPB
     chainloader_edx = current_drive | ((current_partition >> 8) & 0xFF00);
@@ -286,11 +352,9 @@ ntldr_func (char *arg, int flags)
     if (*((unsigned long *) (SCRATCHADDR + BOOTSEC_BPB_HIDDEN_SECTORS)))
        *((unsigned long *) (SCRATCHADDR + BOOTSEC_BPB_HIDDEN_SECTORS)) = (unsigned long)part_start;
 
-    grub_printf("Will boot NTLDR from drive=0x%x, partition=0x%x(hidden sectors=0x%x)\n", current_drive, ((current_partition >> 16) & 0xff), (long)part_start);
+    //grub_printf("Will boot %s from drive=0x%x, partition=0x%x(hidden sectors=0x%x)\n", arg, current_drive, ((current_partition >> 16) & 0xff), (long)part_start);
     
     grub_memmove ((char *)0x7C00, (char *)SCRATCHADDR, 512);
-    
-    chain_load_length = len;
     
     return 1; 
 }
@@ -580,6 +644,7 @@ struct builtin *builtin_table[] =
   &builtin_chainloader,
   
   &builtin_find,
+  &builtin_loadgrub,
   &builtin_ntldr,
   
   &builtin_root,

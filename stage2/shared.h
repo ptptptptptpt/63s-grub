@@ -665,12 +665,8 @@ extern struct builtin *builtin_table[];
 typedef enum
 {
   KERNEL_TYPE_NONE,		/* None is loaded.  */
-  KERNEL_TYPE_MULTIBOOT,	/* Multiboot.  */
-  KERNEL_TYPE_LINUX,		/* Linux.  */
-  KERNEL_TYPE_BIG_LINUX,	/* Big Linux.  */
-  KERNEL_TYPE_FREEBSD,		/* FreeBSD.  */
-  KERNEL_TYPE_NETBSD,		/* NetBSD.  */
   KERNEL_TYPE_CHAINLOADER,	/* Chainloader.  */
+  KERNEL_TYPE_GRUB,	/* stage2 (grub lagecy) or core.img (grub2)  */
   KERNEL_TYPE_NTLDR     	/* Ntldr.  */
 }
 kernel_t;

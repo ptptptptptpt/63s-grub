@@ -95,7 +95,7 @@ print_top_and_end (void)
     console_current_color = top_end_color ;
     console_gotoxy (2,0);
     for (i=0;i<76;i++) grub_printf (" ");
-    console_gotoxy (34,0);
+    console_gotoxy (32,0);
     grub_printf ("63S-GRUB " VERSION );
     
     //打印底栏

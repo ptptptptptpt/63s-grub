@@ -117,7 +117,17 @@ enter_cmdline (char *heap)
   
   console_current_color = ( menu_color & 0xf) ;
   //console_gotoxy (0,0);
-  grub_printf("Builtin commands: boot, chainloader, find, map, ntldr, root, rootnoverify.\n\nPress ESC to return.\n");
+  grub_printf ("63S-GRUB " VERSION "  (Press ESC to return)" "\nBuiltin commands: ");
+  
+    struct builtin **builtin_list;
+    for (builtin_list = builtin_table; *builtin_list != 0; builtin_list++)
+    {
+        grub_printf( "%s ", (*builtin_list)->name );
+    }
+    
+  grub_printf("\n");
+  
+  
   
   while (1)
     {

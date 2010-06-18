@@ -13,7 +13,7 @@ dnl LIABILITY OF ANY KIND FOR ANY DAMAGES WHATSOEVER RESULTING FROM THE
 dnl USE OF THIS SOFTWARE.
 
 AC_PREREQ(2.57)
-AC_INIT([63s-GRUB], [V1.2], [earthengine@gmail.com])
+AC_INIT([63s-GRUB], [V2.0 beta1], [earthengine@gmail.com])
 AC_CONFIG_SRCDIR([stage2/stage2.c])
 AC_CONFIG_HEADER([config.h])
 AM_INIT_AUTOMAKE
@@ -252,12 +252,15 @@ if test x"$enable_reiserfs" = xyes; then
   FSYS_CFLAGS="$FSYS_CFLAGS -DFSYS_REISERFS=1"
 fi
 
-AC_ARG_ENABLE(ext2fs,
-  [  --enable-ext2fs        enable ext2fs support in Stage 2])
 
-if test x"$enable_ext2fs" = xyes; then
+
+AC_ARG_ENABLE(ext2fs,
+  [  --disable-ext2fs           disable ext2/3/4 support in Stage 2])
+
+if test x"$enable_ext2fs" != xno; then
   FSYS_CFLAGS="$FSYS_CFLAGS -DFSYS_EXT2FS=1"
 fi
+
 
 AC_ARG_ENABLE(fat,
   [  --disable-fat           disable FAT support in Stage 2])
