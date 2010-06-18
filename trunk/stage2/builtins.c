@@ -55,7 +55,7 @@ static char *mb_cmdline;
 /* Whether to quiet boot messages or not. */
 int quiet_boot = 0;
 /* The BIOS drive map.  */
-static unsigned short bios_drive_map[DRIVE_MAP_SIZE + 1];
+//static unsigned short bios_drive_map[DRIVE_MAP_SIZE + 1];
 
 
 
@@ -95,30 +95,6 @@ boot_func (char *arg, int flags)
      not KERNEL_TYPE_NONE. Is this assumption is bad?  */
   if (kernel_type != KERNEL_TYPE_NONE)
     unset_int15_handler ();
-
-
-        
-        /* Check if we should set the int13 handler.  */
-        if (bios_drive_map[0] != 0)
-    {
-      int i;
-      
-      /* Search for SAVED_DRIVE.  */
-      for (i = 0; i < DRIVE_MAP_SIZE; i++)
-        {
-          if (! bios_drive_map[i])
-    	break;
-          else if ((bios_drive_map[i] & 0xFF) == saved_drive)
-    	{
-    	  /* Exchage SAVED_DRIVE with the mapped drive.  */
-    	  saved_drive = (bios_drive_map[i] >> 8) & 0xFF;
-    	  break;
-    	}
-        }
-      
-      /* Set the handler. This is somewhat dangerous.  */
-      set_int13_handler (bios_drive_map);
-    }
 
 
   grub_printf("Starting up ...\n");
@@ -250,68 +226,6 @@ static struct builtin builtin_chainloader =
 };
 
 
-
-
-/* map */
-/* Map FROM_DRIVE to TO_DRIVE.  */
-static int
-map_func (char *arg, int flags)
-{
-  char *to_drive;
-  char *from_drive;
-  unsigned long to, from;
-  int i;
-  
-  to_drive = arg;
-  from_drive = skip_to (0, arg);
-
-  /* Get the drive number for TO_DRIVE.  */
-  set_device (to_drive);
-  if (errnum)
-    return 1;
-  to = current_drive;
-
-  /* Get the drive number for FROM_DRIVE.  */
-  set_device (from_drive);
-  if (errnum)
-    return 1;
-  from = current_drive;
-
-  /* Search for an empty slot in BIOS_DRIVE_MAP.  */
-  for (i = 0; i < DRIVE_MAP_SIZE; i++)
-    {
-      /* Perhaps the user wants to override the map.  */
-      if ((bios_drive_map[i] & 0xff) == from)
-	break;
-      
-      if (! bios_drive_map[i])
-	break;
-    }
-
-  if (i == DRIVE_MAP_SIZE)
-    {
-      errnum = ERR_WONT_FIT;
-      return 1;
-    }
-
-  if (to == from)
-    /* If TO is equal to FROM, delete the entry.  */
-    grub_memmove ((char *) &bios_drive_map[i], (char *) &bios_drive_map[i + 1],
-		  sizeof (unsigned short) * (DRIVE_MAP_SIZE - i));
-  else
-    bios_drive_map[i] = from | (to << 8);
-  
-  return 0;
-}
-
-static struct builtin builtin_map =
-{
-  "map",
-  map_func,
-  BUILTIN_CMDLINE | BUILTIN_HELP_LIST,
-  " ",
-  " "
-};
 
 
 
@@ -666,9 +580,6 @@ struct builtin *builtin_table[] =
   &builtin_chainloader,
   
   &builtin_find,
-  
-  &builtin_map,
-  
   &builtin_ntldr,
   
   &builtin_root,

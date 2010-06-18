@@ -95,9 +95,9 @@ init_cmdline (void)
   //count_lines = -1;
   
   /* Restore memory probe state.  */
-  mbi.mem_upper = saved_mem_upper;
-  if (mbi.mmap_length)
-    mbi.flags |= MB_INFO_MEM_MAP;
+//  mbi.mem_upper = saved_mem_upper;
+//  if (mbi.mmap_length)
+//    mbi.flags |= MB_INFO_MEM_MAP;
 
   /* Initialize the data for the builtin commands.  */
   init_builtins ();
