@@ -102,29 +102,29 @@ extern char *grub_scratch_mem;
 #define DEFAULT_FILE_BUFLEN	0x60
 
 /* The buffer for the command-line.  */
-#define CMDLINE_BUF		(DEFAULT_FILE_BUF + DEFAULT_FILE_BUFLEN)
+#define CMDLINE_BUF		(DEFAULT_FILE_BUF + DEFAULT_FILE_BUFLEN) // 0x78260
 #define CMDLINE_BUFLEN		MAX_CMDLINE
 
 /* The kill buffer for the command-line.  */
-#define KILL_BUF		(CMDLINE_BUF + CMDLINE_BUFLEN)
+#define KILL_BUF		(CMDLINE_BUF + CMDLINE_BUFLEN) // 0x78260 + 1600
 #define KILL_BUFLEN		MAX_CMDLINE
 
 /* The history buffer for the command-line.  */
-#define HISTORY_BUF		(KILL_BUF + KILL_BUFLEN)
+#define HISTORY_BUF		(KILL_BUF + KILL_BUFLEN) // 0x78260 + 1600 + 1600
 #define HISTORY_SIZE		5
 #define HISTORY_BUFLEN		(MAX_CMDLINE * HISTORY_SIZE)
 
 /* The buffer for the completion.  */
-#define COMPLETION_BUF		(HISTORY_BUF + HISTORY_BUFLEN)
+#define COMPLETION_BUF		(HISTORY_BUF + HISTORY_BUFLEN) // 0x78260 + 1600 + 1600 + 1600*5
 #define COMPLETION_BUFLEN	MAX_CMDLINE
 
 /* The buffer for the unique string.  */
-#define UNIQUE_BUF		(COMPLETION_BUF + COMPLETION_BUFLEN)
+#define UNIQUE_BUF		(COMPLETION_BUF + COMPLETION_BUFLEN) // 0x78260 + 1600 + 1600 + 1600*5 + 1600
 #define UNIQUE_BUFLEN		MAX_CMDLINE
 
 /* The buffer for the menu entries.  */
-#define MENU_BUF		(UNIQUE_BUF + UNIQUE_BUFLEN)
-#define MENU_BUFLEN		(0x8000 + PASSWORD_BUF - MENU_BUF)
+#define MENU_BUF		(UNIQUE_BUF + UNIQUE_BUFLEN) // 0x78260 + 1600 + 1600 + 1600*5 + 1600 + 1600
+#define MENU_BUFLEN		(0x8000 + PASSWORD_BUF - MENU_BUF) // 0x8000 +  0x78000 - ( 0x78260 + 1600 + 1600 + 1600*5 + 1600 + 1600)
 
 /* The size of the drive map.  */
 #define DRIVE_MAP_SIZE		8
@@ -360,8 +360,8 @@ extern char *grub_scratch_mem;
 
 /* multiboot stuff */
 
-#include "mb_header.h"
-#include "mb_info.h"
+//#include "mb_header.h"
+//#include "mb_info.h"
 
 
 /* Memory map address range descriptor used by GET_MMAP_ENTRY. */

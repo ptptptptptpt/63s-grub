@@ -320,7 +320,7 @@ cmain (void)
     {
         //count_lines = -1;
         num_entries = 0;
-        heap = (char *) mbi.drives_addr + mbi.drives_length;
+        heap = (char *) (MENU_BUF);
         //current_term = term_table;
         console_setcursor(0);
     }
@@ -337,11 +337,11 @@ cmain (void)
         reset ();
         console_cls ();
 
-        grub_timeout = *(char*)(0x8000+496); //倒计时
+        grub_timeout = *(unsigned char*)(0x8000+496); //倒计时
         if (grub_timeout > 0) grub_timeout++; //若无此步，倒计时会少显示一秒。
-        grub_current_entryno = *(char*)(0x8000+497); //默认启动项
-        top_end_color = *(char*)(0x8000+498); //读取颜色
-        menu_color = *(char*)(0x8000+499);
+        grub_current_entryno = *(unsigned char*)(0x8000+497); //默认启动项
+        top_end_color = *(unsigned char*)(0x8000+498); //读取颜色
+        menu_color = *(unsigned char*)(0x8000+499);
 
         get_all_entries(); //将所有启动项起始地址存入 all_entries[] ，同时数出 num_entries 。
 

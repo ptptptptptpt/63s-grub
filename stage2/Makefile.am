@@ -2,7 +2,6 @@
 # For dist target.
 noinst_HEADERS =  \
         fat.h ntfs.h filesys.h freebsd.h fs.h   \
-	     mb_header.h mb_info.h  \
 	  pc_slice.h   shared.h   term.h gpt.h
 
 EXTRA_DIST = setjmp.S $(noinst_SCRIPTS) 63s_grub_cfg
